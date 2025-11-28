@@ -3,44 +3,56 @@ import { FORTUNE_RESULTS, ITEM_DETAILS } from '@/data/omikujiData';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-    // 1. Random total points (0-119)
-    const totalPoints = Math.floor(Math.random() * 120);
+// Probability Weights (Total 100%)
+// 大吉: 20%, 吉: 15%, 中吉: 14%, 小吉: 13%, 末吉: 13%, 凶: 11%, 大凶: 6%
+// Order in FORTUNE_RESULTS: 大凶(0), 凶(1), 末吉(2), 小吉(3), 中吉(4), 吉(5), 大吉(6)
+const WEIGHTS = [
+    { index: 6, weight: 20 }, // 大吉
+    { index: 5, weight: 15 }, // 吉
+    { index: 4, weight: 14 }, // 中吉
+    { index: 3, weight: 13 }, // 小吉
+    { index: 2, weight: 13 }, // 末吉
+    { index: 1, weight: 11 }, // 凶
+    { index: 0, weight: 6 },  // 大凶
+];
 
-    // 2. Determine Fortune
-    let fortuneIndex = 0;
-    if (totalPoints <= 16) fortuneIndex = 0; // 大凶 (0-16)
-    else if (totalPoints <= 33) fortuneIndex = 1; // 凶 (17-33)
-    else if (totalPoints <= 50) fortuneIndex = 2; // 末吉 (34-50)
-    else if (totalPoints <= 67) fortuneIndex = 3; // 小吉 (51-67)
-    else if (totalPoints <= 84) fortuneIndex = 4; // 中吉 (68-84)
-    else if (totalPoints <= 101) fortuneIndex = 5; // 吉 (85-101)
-    else fortuneIndex = 6; // 大吉 (102-118... wait, 102-119 actually since max is 119)
-    // Requirement says: 大吉: 102 〜 118. But totalPoints is 0-119.
-    // If totalPoints is 119, it should also be 大吉.
-    // The ranges are 17 points each.
-    // 0-16 (17)
-    // 17-33 (17)
-    // 34-50 (17)
-    // 51-67 (17)
-    // 68-84 (17)
-    // 85-101 (17)
-    // 102-118 (17) -> This covers up to 118.
-    // What about 119? The prompt says "0 to 119 integer".
-    // And ranges end at 118.
-    // Let's assume 119 is also 大吉 or there's a typo in requirements.
-    // Given 7 * 17 = 119. So 0 to 118 is 119 numbers.
-    // But 0-119 is 120 numbers.
-    // If I strictly follow ranges:
-    // 102-118 is 大吉.
-    // 119 is undefined?
-    // I will include 119 in 大吉 to be safe and cover the full random range.
+// Score Ranges per Fortune
+const SCORE_RANGES: { [key: number]: { min: number, max: number } } = {
+    6: { min: 5, max: 7 }, // 大吉: 5-7
+    5: { min: 4, max: 7 }, // 吉: 4-7
+    4: { min: 4, max: 7 }, // 中吉: 4-7
+    3: { min: 2, max: 5 }, // 小吉: 2-5
+    2: { min: 2, max: 5 }, // 末吉: 2-5
+    1: { min: 1, max: 3 }, // 凶: 1-3
+    0: { min: 0, max: 2 }, // 大凶: 0-2
+};
+
+export async function GET() {
+    // 1. Determine Fortune (Weighted Random)
+    const totalWeight = WEIGHTS.reduce((sum, item) => sum + item.weight, 0); // Should be 92 based on user input, but we treat as ratio
+    let random = Math.random() * totalWeight;
+    let fortuneIndex = 6; // Default
+
+    for (const item of WEIGHTS) {
+        if (random < item.weight) {
+            fortuneIndex = item.index;
+            break;
+        }
+        random -= item.weight;
+    }
 
     const fortune = FORTUNE_RESULTS[fortuneIndex];
 
-    // 3. Determine 17 items details (0-7 points each)
-    const details = ITEM_DETAILS.map(item => {
-        const point = Math.floor(Math.random() * 8); // 0-7
+    // 2. Generate 13 scores based on Fortune
+    const range = SCORE_RANGES[fortuneIndex];
+    const scores = ITEM_DETAILS.map(() => {
+        // Random integer between min and max (inclusive)
+        return Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+    });
+
+    // 3. Map details
+    const details = ITEM_DETAILS.map((item, index) => {
+        const point = scores[index];
         return {
             name: item.name,
             point,
@@ -49,8 +61,9 @@ export async function GET() {
     });
 
     return NextResponse.json({
-        totalPoints,
+        fortuneIndex, // Send index for easier client handling if needed
         fortune,
         details,
+        scores, // Return raw scores for encoding
     });
 }

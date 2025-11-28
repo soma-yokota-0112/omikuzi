@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import ResultClient from './ResultClient';
+import { decodeResult } from '@/utils/logic';
+import { FORTUNE_RESULTS } from '@/data/omikujiData';
 
 type Props = {
     searchParams: { [key: string]: string | string[] | undefined }
@@ -8,8 +10,17 @@ type Props = {
 export async function generateMetadata(
     { searchParams }: Props
 ): Promise<Metadata> {
-    const fortune = searchParams.f;
-    const title = typeof fortune === 'string' ? `運勢は【${fortune}】でした` : 'おみくじ結果';
+    const code = searchParams.code;
+    let title = 'おみくじ結果';
+
+    if (typeof code === 'string') {
+        const decoded = decodeResult(code);
+        if (decoded) {
+            const { fortuneIndex } = decoded;
+            const fortune = FORTUNE_RESULTS[fortuneIndex];
+            title = `運勢は【${fortune.title}】でした`;
+        }
+    }
 
     return {
         title: `${title} | 純粋おみくじ`,
@@ -17,17 +28,18 @@ export async function generateMetadata(
         openGraph: {
             title: `${title} | 純粋おみくじ`,
             description: 'あなたの運勢を占います。',
-            images: [`/api/og?title=${encodeURIComponent(typeof fortune === 'string' ? fortune : '')}`],
+            images: [`/api/og?code=${typeof code === 'string' ? code : ''}`],
         },
         twitter: {
             card: 'summary_large_image',
             title: `${title} | 純粋おみくじ`,
             description: 'あなたの運勢を占います。',
-            images: [`/api/og?title=${encodeURIComponent(typeof fortune === 'string' ? fortune : '')}`],
+            images: [`/api/og?code=${typeof code === 'string' ? code : ''}`],
         },
     };
 }
 
-export default function ResultPage() {
-    return <ResultClient />;
+export default function ResultPage({ searchParams }: Props) {
+    const code = typeof searchParams.code === 'string' ? searchParams.code : undefined;
+    return <ResultClient initialCode={code} />;
 }

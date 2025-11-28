@@ -3,27 +3,20 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-[url('/pattern-bg.png')] bg-repeat">
-      <main className="flex flex-col items-center gap-8 max-w-md w-full bg-white/80 backdrop-blur-sm p-12 rounded-xl shadow-xl border-4 border-red-800">
-        <h1 className="text-4xl font-bold tracking-widest text-red-800 mb-4">
-          おみくじ
+      <main className="flex flex-col items-center gap-8 max-w-sm w-full bg-white/90 backdrop-blur-sm p-10 rounded-sm shadow-2xl border-t-4 border-[#B03A2E]">
+        <h1 className="text-5xl font-bold tracking-[0.3em] text-[#B03A2E] mb-2 writing-vertical-rl h-48 mx-auto">
+          御神籤
         </h1>
-        <p className="text-lg text-stone-700 leading-relaxed">
-          古来より伝わる運勢占い。<br />
-          あなたの今日の運命を<br />
-          紐解いてみませんか。
+        <p className="text-sm text-stone-600 leading-loose tracking-wider">
+          運命を紐解く<br />
+          静寂のひととき
         </p>
-
-        <div className="my-8">
-          <div className="w-32 h-48 bg-red-800 mx-auto rounded-lg shadow-inner flex items-center justify-center border-2 border-yellow-600">
-            <span className="text-white text-2xl font-bold writing-vertical-rl">御神籤</span>
-          </div>
-        </div>
 
         <Link
           href="/result"
-          className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-red-700 rounded-full hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-700 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+          className="group relative inline-flex items-center justify-center px-10 py-4 text-base font-medium text-white transition-all duration-300 bg-[#B03A2E] rounded-sm hover:bg-[#922B21] shadow-md hover:shadow-lg tracking-widest mt-4"
         >
-          おみくじを引く
+          運勢を占う
         </Link>
       </main>
 
