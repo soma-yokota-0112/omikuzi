@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { Share2, RefreshCw, Download, Copy, MessageCircle } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { decodeResult, encodeResult } from '@/utils/logic';
-import { FORTUNE_RESULTS, ITEM_DETAILS } from '@/data/omikujiData';
+import { FORTUNE_RESULTS, ITEM_DETAILS, OMIKUJI_TRIVIA } from '@/data/omikujiData';
+import { getSlugByName } from '@/data/guidanceData';
 
 interface FortuneData {
     totalPoints: number;
@@ -29,10 +30,14 @@ interface Props {
 export default function ResultClient({ initialCode }: Props) {
     const [loading, setLoading] = useState(!initialCode);
     const [data, setData] = useState<FortuneData | null>(null);
+    const [trivia, setTrivia] = useState(OMIKUJI_TRIVIA[0]);
     const resultRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
     useEffect(() => {
+        // Set random trivia on mount
+        setTrivia(OMIKUJI_TRIVIA[Math.floor(Math.random() * OMIKUJI_TRIVIA.length)]);
+
         const init = async () => {
             if (initialCode) {
                 // Decode existing code
@@ -55,8 +60,8 @@ export default function ResultClient({ initialCode }: Props) {
             }
 
             // Fetch new result if no code or invalid code
-            // Artificial delay for animation
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Artificial delay for animation and trivia reading
+            await new Promise(resolve => setTimeout(resolve, 3000));
 
             try {
                 const res = await fetch('/api/draw');
@@ -80,7 +85,8 @@ export default function ResultClient({ initialCode }: Props) {
 
     const handleLineShare = () => {
         if (!data) return;
-        const text = `私の今日の運勢は【${data.fortune.title}】でした！ #純粋おみくじ`;
+        const currentYear = new Date().getFullYear();
+        const text = `私の${currentYear}年の運勢は【${data.fortune.title}】でした！ #今年の運勢 #おみくじアプリ`;
         const url = window.location.href;
         const shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + '\n' + url)}`;
         window.open(shareUrl, '_blank');
@@ -88,7 +94,8 @@ export default function ResultClient({ initialCode }: Props) {
 
     const handleXShare = () => {
         if (!data) return;
-        const text = `私の今日の運勢は【${data.fortune.title}】でした！ #純粋おみくじ`;
+        const currentYear = new Date().getFullYear();
+        const text = `私の${currentYear}年の運勢は【${data.fortune.title}】でした！ #今年の運勢 #おみくじアプリ`;
         const url = window.location.href;
         const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
         window.open(shareUrl, '_blank');
@@ -108,6 +115,12 @@ export default function ResultClient({ initialCode }: Props) {
             return;
         }
 
+        // Hide ads temporarily
+        const adContainers = document.querySelectorAll('.js-ad-container');
+        adContainers.forEach((el) => {
+            (el as HTMLElement).style.display = 'none';
+        });
+
         try {
             const dataUrl = await toPng(resultRef.current, { cacheBust: true, backgroundColor: '#f5f5f4' }); // stone-100
             const link = document.createElement('a');
@@ -116,20 +129,31 @@ export default function ResultClient({ initialCode }: Props) {
             link.click();
         } catch (err) {
             console.error('Failed to save image', err);
+        } finally {
+            // Restore ads
+            adContainers.forEach((el) => {
+                (el as HTMLElement).style.display = '';
+            });
         }
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-stone-100">
-                <div className="animate-bounce">
-                    <div className="w-32 h-48 bg-red-800 mx-auto rounded-lg shadow-inner flex items-center justify-center border-2 border-yellow-600 animate-shake">
-                        <span className="text-white text-2xl font-bold writing-vertical-rl">御神籤</span>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-stone-100 p-4">
+                {/* Ad Spot (Replaces Animation) */}
+                <div className="w-full max-w-sm mb-8">
+                    <div className="w-full h-[250px] bg-stone-200 border border-stone-300 border-dashed flex items-center justify-center text-stone-400 text-sm">
+                        スポンサーリンク (レスポンシブ)
                     </div>
                 </div>
-                <p className="mt-8 text-xl text-stone-600 font-serif animate-pulse">
-                    運命を紐解いています...
-                </p>
+
+                <div className="max-w-sm w-full bg-white p-6 rounded-sm shadow-md border-t-4 border-[#B03A2E]">
+                    <p className="text-center text-[#B03A2E] font-bold mb-2 text-sm">おみくじ豆知識</p>
+                    <h3 className="text-center font-bold text-stone-800 mb-3">{trivia.title}</h3>
+                    <p className="text-sm text-stone-600 leading-relaxed text-justify">
+                        {trivia.content}
+                    </p>
+                </div>
                 <style jsx>{`
           @keyframes shake {
             0%, 100% { transform: rotate(0deg); }
@@ -152,53 +176,81 @@ export default function ResultClient({ initialCode }: Props) {
             <div
                 ref={resultRef}
                 id="omikuji-paper-content"
-                className="max-w-md w-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden relative"
+                className="w-full max-w-md bg-[#FFFDFD] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden relative"
             >
                 {/* Decorative Top Border */}
                 <div className="h-2 w-full bg-[#B03A2E]"></div>
 
                 {/* Header / Fortune Result */}
-                <div className="p-6 text-center">
-                    <p className="text-stone-500 mb-2 text-[10px] tracking-[0.2em]">今日の運勢</p>
-                    <h1 className="text-5xl font-bold text-[#B03A2E] mb-4 tracking-widest">{data.fortune.title}</h1>
+                <div className="p-6 text-center pb-2 flex flex-col items-center">
+                    <p className="text-stone-500 mb-4 text-[10px] tracking-[0.2em]">{new Date().getFullYear()}年の運勢</p>
 
-                    <div className="bg-stone-50 p-4 mx-auto border border-stone-100">
-                        <p className="text-lg font-medium text-stone-800 leading-normal tracking-wide writing-vertical-rl mx-auto h-32">
-                            {data.fortune.poem}
-                        </p>
-                        <div className="h-px w-full bg-[#B03A2E]/20 mx-auto my-2"></div>
-                        <p className="text-stone-600 text-[11px] leading-normal text-left">
-                            {data.fortune.modernText}
-                        </p>
+                    {/* Poem and Translation - Vertical Stack (Continuous) */}
+                    <div className="flex flex-col items-center mb-4 gap-0">
+                        {/* Poem */}
+                        <div className="h-auto">
+                            <p
+                                className="text-lg font-medium text-stone-800 leading-[3] tracking-wider [writing-mode:vertical-rl] whitespace-normal"
+                                dangerouslySetInnerHTML={{ __html: data.fortune.poem }}
+                            />
+                        </div>
+                        {/* Translation */}
+                        <div className="h-auto">
+                            <p
+                                className="text-xs text-stone-600 leading-[2.5] tracking-wide [writing-mode:vertical-rl] whitespace-normal"
+                                dangerouslySetInnerHTML={{ __html: data.fortune.modernText.replace(/([。、])/g, '$1<br />') }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Fortune Title - Moved Below Poem */}
+                    <h1 className="text-5xl font-bold text-[#B03A2E] mb-6 tracking-widest">{data.fortune.title}</h1>
+                </div>
+
+                {/* Details List (Horizontal Columns with Vertical Text - Right to Left) */}
+                <div className="px-4 pb-8 bg-[#FFFDFD]">
+                    {/* flex-row-reverse to make the first item (Ganbou) appear on the Right */}
+                    {/* flex-wrap to allow wrapping on smaller screens */}
+                    <div className="flex flex-row-reverse flex-wrap gap-0 justify-center items-stretch">
+                        {data.details.map((item, index) => {
+                            const slug = getSlugByName(item.name);
+                            return (
+                                <div
+                                    key={index}
+                                    className={`flex flex-col items-center ${index !== data.details.length - 1 ? 'border-l border-stone-300' : ''} px-1 py-4 min-h-[380px] w-[30px] writing-vertical-rl`}
+                                >
+                                    {/* Item Name - Top (visually top in vertical-rl) */}
+                                    <div className="flex-shrink-0 mb-3">
+                                        <h3 className="font-bold text-[#B03A2E] text-xs tracking-wider">
+                                            {slug ? (
+                                                <Link href={`/guidance/${slug}`} className="hover:underline transition-colors">
+                                                    {item.name}
+                                                </Link>
+                                            ) : (
+                                                item.name
+                                            )}
+                                        </h3>
+                                    </div>
+                                    {/* Item Text - Below, aligned to start */}
+                                    <div className="flex-1 flex items-start justify-center">
+                                        <p
+                                            className="text-stone-700 text-[10px] leading-[1.3] tracking-wide [writing-mode:vertical-rl] whitespace-normal"
+                                            dangerouslySetInnerHTML={{ __html: item.text }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* Details List (Single Column) */}
-                <div className="px-8 pb-8 bg-white">
-                    <div className="flex flex-col space-y-3">
-                        {data.details.map((item, index) => (
-                            <div key={index} className="flex flex-col border-l border-stone-400 border-dotted pl-3 py-0.5">
-                                <h3 className="font-bold text-stone-800 text-xs mb-0.5">{item.name}</h3>
-                                <p className="text-stone-600 text-[11px] leading-tight">{item.text}</p>
-                            </div>
-                        ))}
+                {/* Ad Spot 1 (Main) - Moved to Bottom */}
+                <div className="px-4 pb-6 js-ad-container">
+                    <div className="w-full h-[100px] bg-stone-100 border border-stone-200 border-dashed flex items-center justify-center text-stone-400 text-xs">
+                        スポンサーリンク (レスポンシブ)
                     </div>
                 </div>
 
-                {/* Footer Seal (Visual flair) */}
-                <div className="pb-6 text-center">
-                    <div className="inline-block border border-[#B03A2E] text-[#B03A2E] text-[10px] px-2 py-1 rounded-sm opacity-50">
-                        純粋おみくじ
-                    </div>
-                </div>
-            </div>
-
-            {/* Ad Placeholder (Monetization) */}
-            <div className="max-w-md w-full mt-6 bg-stone-100 border border-stone-300 p-4 text-center rounded-lg">
-                <p className="text-xs text-stone-400 mb-2">スポンサーリンク</p>
-                <div className="w-full h-[250px] bg-stone-200 flex items-center justify-center text-stone-400 text-sm">
-                    広告スペース (300x250)
-                </div>
             </div>
 
             {/* Actions (Outside of capture area) */}
@@ -235,9 +287,16 @@ export default function ResultClient({ initialCode }: Props) {
                     URLをコピー
                 </button>
 
+                {/* Ad Spot 2 (Sub) - Moved between buttons */}
+                <div className="sm:col-span-2 flex justify-center my-2">
+                    <div className="w-full h-[100px] bg-stone-100 border border-stone-300 border-dashed flex items-center justify-center text-stone-400 text-xs rounded-lg">
+                        スポンサーリンク (300x100)
+                    </div>
+                </div>
+
                 <Link
                     href="/"
-                    className="flex items-center justify-center px-4 py-3 border border-[#B03A2E] text-[#B03A2E] rounded-md hover:bg-red-50 transition-colors shadow-sm sm:col-span-2 mt-2 text-xs tracking-wide"
+                    className="flex items-center justify-center px-4 py-3 bg-[#B03A2E] text-white rounded-md hover:bg-[#922B21] hover:shadow-lg transition-all shadow-md sm:col-span-2 text-xs tracking-wide font-bold"
                 >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     もう一度引く

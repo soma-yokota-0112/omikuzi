@@ -52,7 +52,7 @@ export async function GET(request: Request) {
                             fontWeight: 'bold',
                         }}
                     >
-                        今日の運勢
+                        {new Date().getFullYear()}年の運勢
                     </div>
                     <div
                         style={{
@@ -71,7 +71,7 @@ export async function GET(request: Request) {
                             marginTop: 30,
                         }}
                     >
-                        純粋おみくじ
+                        今年の運勢
                     </div>
                 </div>
             </div>
