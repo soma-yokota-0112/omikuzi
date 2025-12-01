@@ -26,7 +26,8 @@ export interface DecodedResult {
 }
 
 export function encodeResult(fortuneIndex: number, scores: number[]): string {
-    const rawString = `${fortuneIndex}${scores.join('')}`;
+    // Use a separator to handle variable length fortuneIndex
+    const rawString = `${fortuneIndex}-${scores.join('')}`;
     if (typeof window !== 'undefined') {
         return btoa(rawString);
     } else {
@@ -43,14 +44,26 @@ export function decodeResult(code: string): DecodedResult | null {
             rawString = Buffer.from(code, 'base64').toString('ascii');
         }
 
-        // Check if valid (should be 14 digits)
-        // First digit 0-6, rest 0-7
-        if (!/^[0-6][0-7]{13}$/.test(rawString)) {
+        // Expected format: "INDEX-SCORES"
+        // INDEX: number
+        // SCORES: 13 digits (0-7)
+
+        const parts = rawString.split('-');
+        if (parts.length !== 2) {
+            // Fallback for backward compatibility or invalid format
+            // Try parsing as old format if length is 14 and starts with 0-6?
+            // But old format was broken for >9 index anyway.
             return null;
         }
 
-        const fortuneIndex = parseInt(rawString[0], 10);
-        const scores = rawString.slice(1).split('').map(Number);
+        const fortuneIndex = parseInt(parts[0], 10);
+        const scoresStr = parts[1];
+
+        if (isNaN(fortuneIndex) || scoresStr.length !== 13 || !/^[0-7]{13}$/.test(scoresStr)) {
+            return null;
+        }
+
+        const scores = scoresStr.split('').map(Number);
 
         return { fortuneIndex, scores };
     } catch (e) {

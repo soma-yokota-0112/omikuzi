@@ -31,6 +31,7 @@ export default function ResultClient({ initialCode }: Props) {
     const [loading, setLoading] = useState(!initialCode);
     const [data, setData] = useState<FortuneData | null>(null);
     const [trivia, setTrivia] = useState(OMIKUJI_TRIVIA[0]);
+    const [generatedCode, setGeneratedCode] = useState<string | null>(null);
     const resultRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
@@ -61,16 +62,17 @@ export default function ResultClient({ initialCode }: Props) {
 
             // Fetch new result if no code or invalid code
             // Artificial delay for animation and trivia reading
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 4000));
 
             try {
                 const res = await fetch('/api/draw');
                 const json = await res.json();
                 // json has fortuneIndex and scores
                 const code = encodeResult(json.fortuneIndex, json.scores);
+                setGeneratedCode(code);
 
                 // Update URL without reloading
-                router.replace(`/result?code=${code}`);
+                router.replace(`/result?code=${encodeURIComponent(code)}`);
 
                 setData(json);
             } catch (error) {
@@ -176,17 +178,17 @@ export default function ResultClient({ initialCode }: Props) {
             <div
                 ref={resultRef}
                 id="omikuji-paper-content"
-                className="w-full max-w-md bg-[#FFFDFD] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden relative"
+                className="w-full max-w-sm bg-[#FFFDFD] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden relative"
             >
                 {/* Decorative Top Border */}
                 <div className="h-2 w-full bg-[#B03A2E]"></div>
 
                 {/* Header / Fortune Result */}
                 <div className="p-6 text-center pb-2 flex flex-col items-center">
-                    <p className="text-stone-500 mb-4 text-[10px] tracking-[0.2em]">{new Date().getFullYear()}年の運勢</p>
+                    <p className="text-stone-500 mb-4 text-sm tracking-[0.2em]">{new Date().getFullYear()}年の運勢</p>
 
                     {/* Poem and Translation - Vertical Stack (Continuous) */}
-                    <div className="flex flex-col items-center mb-4 gap-0">
+                    <div className="flex flex-col items-center mb-4 gap-0 w-full">
                         {/* Poem */}
                         <div className="h-auto">
                             <p
@@ -194,36 +196,51 @@ export default function ResultClient({ initialCode }: Props) {
                                 dangerouslySetInnerHTML={{ __html: data.fortune.poem }}
                             />
                         </div>
+
+                        {/* Divider 1: Poem <-> Translation */}
+                        <div className="w-full border-t border-stone-400 border-dotted mt-2 mb-4"></div>
+
                         {/* Translation */}
                         <div className="h-auto">
                             <p
-                                className="text-xs text-stone-600 leading-[2.5] tracking-wide [writing-mode:vertical-rl] whitespace-normal"
-                                dangerouslySetInnerHTML={{ __html: data.fortune.modernText.replace(/([。、])/g, '$1<br />') }}
+                                className="text-xs text-stone-700 leading-[2.5] tracking-wide [writing-mode:vertical-rl] whitespace-normal"
+                                dangerouslySetInnerHTML={{ __html: data.fortune.modernText }}
                             />
                         </div>
                     </div>
 
+                    {/* Divider 2: Translation <-> Title */}
+                    <div className="w-full border-t border-stone-400 border-dotted mt-2 mb-4"></div>
+
                     {/* Fortune Title - Moved Below Poem */}
-                    <h1 className="text-5xl font-bold text-[#B03A2E] mb-6 tracking-widest">{data.fortune.title}</h1>
+                    <h1 className="text-3xl font-bold text-[#B03A2E] my-3 tracking-widest">{data.fortune.title}</h1>
+
+                    {/* Divider 3: Title <-> Details */}
+                    <div className="w-full border-t border-stone-400 border-dotted mt-2 mb-4"></div>
                 </div>
 
                 {/* Details List (Horizontal Columns with Vertical Text - Right to Left) */}
                 <div className="px-4 pb-8 bg-[#FFFDFD]">
                     {/* flex-row-reverse to make the first item (Ganbou) appear on the Right */}
                     {/* flex-wrap to allow wrapping on smaller screens */}
-                    <div className="flex flex-row-reverse flex-wrap gap-0 justify-center items-stretch">
+                    {/* max-w-[300px] forces a wrap after 7 items (7 * 40px = 280px + borders) */}
+                    <div className="flex flex-row-reverse flex-wrap gap-0 justify-center items-stretch max-w-[280px] mx-auto">
                         {data.details.map((item, index) => {
                             const slug = getSlugByName(item.name);
+                            const codeToUse = initialCode || generatedCode;
                             return (
                                 <div
                                     key={index}
-                                    className={`flex flex-col items-center ${index !== data.details.length - 1 ? 'border-l border-stone-300' : ''} px-1 py-4 min-h-[380px] w-[30px] writing-vertical-rl`}
+                                    className={`flex flex-col items-center ${index !== data.details.length - 1 && index !== 6 ? 'border-l border-stone-300' : ''} px-1 py-4 w-[40px] writing-vertical-rl`}
                                 >
                                     {/* Item Name - Top (visually top in vertical-rl) */}
                                     <div className="flex-shrink-0 mb-3">
-                                        <h3 className="font-bold text-[#B03A2E] text-xs tracking-wider">
+                                        <h3 className="font-extrabold text-[#B03A2E] text-xs tracking-wider">
                                             {slug ? (
-                                                <Link href={`/guidance/${slug}`} className="hover:underline transition-colors">
+                                                <Link
+                                                    href={`/guidance/${slug}${codeToUse ? `?code=${encodeURIComponent(codeToUse)}` : ''}`}
+                                                    className="hover:underline transition-colors"
+                                                >
                                                     {item.name}
                                                 </Link>
                                             ) : (
@@ -234,7 +251,7 @@ export default function ResultClient({ initialCode }: Props) {
                                     {/* Item Text - Below, aligned to start */}
                                     <div className="flex-1 flex items-start justify-center">
                                         <p
-                                            className="text-stone-700 text-[10px] leading-[1.3] tracking-wide [writing-mode:vertical-rl] whitespace-normal"
+                                            className="text-stone-700 text-[11px] leading-[1.3] tracking-wide [writing-mode:vertical-rl] whitespace-normal"
                                             dangerouslySetInnerHTML={{ __html: item.text }}
                                         />
                                     </div>
@@ -253,8 +270,11 @@ export default function ResultClient({ initialCode }: Props) {
 
             </div>
 
+            {/* Interaction Hint - Moved Outside */}
+            <p className="text-center text-xs text-stone-800 font-bold mt-2 mb-1">※項目の内容は、項目をタップすると表示されます</p>
+
             {/* Actions (Outside of capture area) */}
-            <div className="max-w-md w-full mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="max-w-md w-full mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                     onClick={handleXShare}
                     className="flex items-center justify-center px-4 py-3 bg-black text-white rounded-md hover:bg-stone-800 transition-colors shadow-sm text-xs tracking-wide"

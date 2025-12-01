@@ -11,13 +11,13 @@ export default function Home() {
           <h2 className="text-xl font-bold text-stone-600 mb-2 tracking-widest">
             あなたの{currentYear}年の運勢は？
           </h2>
-          <h1 className="text-6xl font-bold tracking-widest text-[#B03A2E] mb-4 font-serif">
-            御神籤
-          </h1>
-          <p className="text-sm text-stone-700 font-medium leading-relaxed tracking-wide">
-            神籤（おみくじ）は、吉凶を占うだけでなく、<br />
-            {currentYear}年の行動指針を示すものです。
-          </p>
+          <div className="bg-stone-100/50 p-3 rounded-md mt-2">
+            <p className="text-sm text-stone-700 font-medium leading-relaxed tracking-wide">
+              神籤（おみくじ）は吉凶を占うだけでなく<br />
+              {currentYear}年の行動指針を示すものです<br />
+              <span className="text-xs text-stone-500 mt-2 block">神社で引くおみくじと同様の内容にしています</span>
+            </p>
+          </div>
         </div>
 
         <div className="w-full my-2 flex flex-col items-center gap-4">
@@ -32,17 +32,17 @@ export default function Home() {
 
         <Link
           href="/result"
-          className="group relative inline-flex items-center justify-center w-full px-8 py-4 text-lg font-bold text-white transition-all duration-300 bg-[#B03A2E] rounded-md hover:bg-[#922B21] shadow-md hover:shadow-lg tracking-widest"
+          className="group relative inline-flex items-center justify-center w-full px-8 py-5 text-xl font-bold text-white transition-all duration-200 bg-[#B03A2E] rounded-lg shadow-[0_4px_0_#7f1d1d] hover:shadow-[0_2px_0_#7f1d1d] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] tracking-widest"
         >
-          運勢を占う
+          おみくじを引く
         </Link>
       </main>
 
-      <footer className="mt-12 text-stone-500 text-sm flex flex-col items-center gap-3">
-        <Link href="/privacy-policy" className="hover:underline hover:text-stone-700 transition-colors font-medium">
+      <footer className="mt-12 flex flex-col items-center gap-3">
+        <Link href="/privacy-policy" className="text-stone-800 hover:text-[#B03A2E] transition-colors font-bold text-sm">
           プライバシーポリシー
         </Link>
-        <p>&copy; {currentYear}</p>
+        <p className="text-stone-700 text-xs font-bold">&copy; {currentYear}</p>
       </footer>
     </div>
   );

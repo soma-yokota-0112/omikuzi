@@ -28,13 +28,13 @@ export async function generateMetadata(
         openGraph: {
             title: `${title} | 今年の運勢`,
             description: 'あなたの運勢を占います。',
-            images: [`/api/og?code=${typeof code === 'string' ? code : ''}`],
+            images: [`/api/og?code=${typeof code === 'string' ? encodeURIComponent(code) : ''}`],
         },
         twitter: {
             card: 'summary_large_image',
             title: `${title} | 今年の運勢`,
             description: 'あなたの運勢を占います。',
-            images: [`/api/og?code=${typeof code === 'string' ? code : ''}`],
+            images: [`/api/og?code=${typeof code === 'string' ? encodeURIComponent(code) : ''}`],
         },
     };
 }
