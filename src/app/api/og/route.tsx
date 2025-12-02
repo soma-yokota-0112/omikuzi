@@ -1,10 +1,21 @@
 import { ImageResponse } from 'next/og';
+import { decodeResult } from '@/utils/logic';
+import { FORTUNE_RESULTS } from '@/data/omikujiData';
 
 export const runtime = 'edge';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    const title = searchParams.get('title') || 'おみくじ';
+    const code = searchParams.get('code');
+    let title = searchParams.get('title') || 'おみくじ';
+
+    if (code) {
+        const decoded = decodeResult(code);
+        if (decoded) {
+            const { fortuneIndex } = decoded;
+            title = FORTUNE_RESULTS[fortuneIndex].title;
+        }
+    }
 
     return new ImageResponse(
         (
@@ -41,7 +52,7 @@ export async function GET(request: Request) {
                             fontWeight: 'bold',
                         }}
                     >
-                        今日の運勢
+                        {new Date().getFullYear()}年の運勢
                     </div>
                     <div
                         style={{
@@ -60,7 +71,7 @@ export async function GET(request: Request) {
                             marginTop: 30,
                         }}
                     >
-                        純粋おみくじ
+                        今年の運勢
                     </div>
                 </div>
             </div>
