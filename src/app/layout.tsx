@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 
@@ -20,6 +21,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      {/* Google AdSense - headタグ内に配置 */}
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1401337378112883"
+        crossOrigin="anonymous"
+        strategy="beforeInteractive"
+      />
       <body
         className={`${shipporiMincho.variable} font-serif antialiased bg-stone-100 text-stone-800`}
       >
