@@ -112,54 +112,52 @@ export default function LoveResultClient() {
 
                 {/* Message Section */}
                 <div className="px-8 py-6">
-                    <div className="bg-gradient-to-br from-pink-50 to-pink-100/50 rounded-2xl p-6 border-2 border-pink-200 flex gap-4 items-center">
-                        {/* Text content - left aligned */}
-                        <div className="flex-1">
-                            <p
-                                className="text-base leading-loose text-pink-900 text-left"
-                                style={{
-                                    fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif"
-                                }}
-                                dangerouslySetInnerHTML={{ __html: data.fortune.message }}
-                            />
-                        </div>
-
-                        {/* Image placeholder - moved to right */}
-                        <div className="flex-shrink-0 w-48 h-48 bg-pink-200 rounded-xl flex items-center justify-center">
-                            {data.fortune.imageUrl ? (
-                                <img src={data.fortune.imageUrl} alt={data.fortune.title} className="w-full h-full object-cover rounded-xl" />
-                            ) : (
-                                <span className="text-4xl">🖼️</span>
-                            )}
-                        </div>
+                    <div className="bg-gradient-to-br from-pink-50 to-pink-100/50 rounded-2xl p-6 border-2 border-pink-200">
+                        <p
+                            className="text-base leading-relaxed text-pink-900 text-center"
+                            style={{
+                                fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif"
+                            }}
+                            dangerouslySetInnerHTML={{ __html: data.fortune.message }}
+                        />
                     </div>
                 </div>
 
-                {/* Details Section - Compressed */}
+                {/* ラッキーアイテムセクション */}
+                <div className="px-8 py-6 bg-gradient-to-b from-pink-50 to-white border-t-2 border-pink-100">
+                    <h3 className="text-xl font-bold text-pink-600 mb-4 text-center flex items-center justify-center gap-2" style={{ fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif" }}>
+                        <span>🎁</span>
+                        <span>ラッキーアイテム</span>
+                    </h3>
+                    <div className="flex flex-wrap justify-center gap-3">
+                        {data.fortune.luckyItems.map((item, index) => (
+                            <div key={index} className="bg-gradient-to-br from-pink-100 to-pink-200 px-4 py-2 rounded-full border-2 border-pink-300 shadow-sm">
+                                <p className="text-sm font-bold text-pink-700" style={{ fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif" }}>
+                                    {item}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 詳細運勢セクション - 2列 */}
                 <div className="px-6 py-4 bg-gradient-to-b from-white to-pink-50">
-                    {/* Grid Layout for 10 items - Compressed */}
+                    {/* 2列グリッドレイアウト */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {data.fortune.details.map((detail, index) => (
                             <div
                                 key={index}
-                                className="bg-white rounded-xl p-3 border-2 border-pink-200 hover:border-pink-400 transition-all hover:shadow-md"
+                                className="bg-white rounded-xl p-4 border-2 border-pink-200 hover:border-pink-400 transition-all hover:shadow-md"
                             >
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xl">{getDetailEmoji(detail.name)}</span>
-                                    <h3 className="text-base font-bold text-pink-600" style={{ fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif" }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-2xl">{getDetailEmoji(detail.name)}</span>
+                                    <h3 className="text-lg font-bold text-pink-600" style={{ fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif" }}>
                                         {detail.name}
                                     </h3>
                                 </div>
-                                <p className="text-xs text-pink-900 leading-relaxed mb-2" style={{ fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif" }}>
+                                <p className="text-sm text-pink-900 leading-relaxed" style={{ fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif" }}>
                                     {detail.text}
                                 </p>
-                                <div className="mt-1 pt-1 border-t border-pink-100">
-                                    <p className="text-xs text-pink-500 flex items-center gap-1" style={{ fontFamily: "'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif" }}>
-                                        <span>🎁</span>
-                                        <span className="font-bold">ラッキーアイテム:</span>
-                                        <span>{detail.luckyItem}</span>
-                                    </p>
-                                </div>
                             </div>
                         ))}
                     </div>
@@ -255,10 +253,10 @@ interface LoveFortune {
         title: string;
         message: string;
         imageUrl?: string;
+        luckyItems: string[];
         details: Array<{
             name: string;
             text: string;
-            luckyItem: string;
         }>;
     };
 }

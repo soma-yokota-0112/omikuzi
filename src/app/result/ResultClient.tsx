@@ -190,7 +190,7 @@ export default function ResultClient({ initialCode }: Props) {
                     {/* Poem and Translation - Vertical Stack (Continuous) */}
                     <div className="flex flex-col items-center mb-4 gap-0 w-full">
                         {/* Poem */}
-                        <div className="h-auto">
+                        <div className="h-auto flex justify-center w-full">
                             <p
                                 className="text-lg font-medium text-stone-800 leading-[3] tracking-wider [writing-mode:vertical-rl] whitespace-normal"
                                 dangerouslySetInnerHTML={{ __html: data.fortune.poem }}
@@ -201,7 +201,7 @@ export default function ResultClient({ initialCode }: Props) {
                         <div className="w-full border-t border-stone-400 border-dotted mt-2 mb-4"></div>
 
                         {/* Translation */}
-                        <div className="h-auto">
+                        <div className="h-auto flex justify-center w-full">
                             <p
                                 className="text-xs text-stone-700 leading-[2.5] tracking-wide [writing-mode:vertical-rl] whitespace-normal"
                                 dangerouslySetInnerHTML={{ __html: data.fortune.modernText }}

@@ -106,9 +106,14 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="mt-8 flex flex-col items-center gap-3">
-          <Link href="/privacy-policy" className="text-stone-800 hover:text-[#B03A2E] transition-colors font-bold text-sm">
-            プライバシーポリシー
-          </Link>
+          <div className="flex gap-4">
+            <Link href="/privacy-policy" className="text-stone-800 hover:text-[#B03A2E] transition-colors font-bold text-sm">
+              プライバシーポリシー
+            </Link>
+            <Link href="/disclaimer" className="text-stone-800 hover:text-[#B03A2E] transition-colors font-bold text-sm">
+              免責事項
+            </Link>
+          </div>
           <p className="text-stone-700 text-xs font-bold">&copy; {currentYear}</p>
         </footer>
       </div>
