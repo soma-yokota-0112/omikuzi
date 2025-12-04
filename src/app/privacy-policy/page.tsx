@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export default function PrivacyPolicy() {
     return (
@@ -13,7 +14,7 @@ export default function PrivacyPolicy() {
                         制定日: 2025年12月1日
                     </p>
                     <p className="text-right text-stone-500">
-                        開発者: [開発者名または会社名]
+                        開発者: ぱんぱす
                     </p>
 
                     <section>
@@ -33,7 +34,8 @@ export default function PrivacyPolicy() {
                                 <strong>アクセス解析ツール:</strong> 当アプリは、利用状況の分析のため、Google Firebase Analytics（または Google Analytics）を使用しています。これに伴い、利用者の端末情報、利用時間、操作履歴などがGoogle社に送信される場合がありますが、<strong>個人を特定する情報は含まれません。</strong>これらの情報は、サービス改善および利用傾向の把握のためにのみ使用されます。
                             </li>
                             <li>
-                                <strong>広告配信サービス:</strong> 当アプリは、収益化のため、Google AdMob（またはその他の広告ネットワーク名）などの第三者広告配信事業者を利用しています。広告配信事業者は、利用者の興味に応じた広告を表示するため、当アプリや他のウェブサイトへのアクセス情報に基づいた<strong>Cookie（クッキー）</strong>などの識別情報を利用する場合がありますが、個人を特定する目的では一切使用されません。
+                                <strong>広告配信サービス:</strong> 当アプリは、収益化のため、Google AdMob（またはその他の広告ネットワーク名）などの第三者広告配信事業者を利用しています。広告配信事業者は、利用者の興味に応じた広告を表示するため、当アプリや他のウェブサイトへのアクセス情報に基づいた<strong>Cookie（クッキー）</strong>などの識別情報を利用する場合がありますが、個人を特定する目的では一切使用されません。<br />
+                                ユーザーは、<a href="https://adssettings.google.com/authenticated" target="_blank" rel="noopener noreferrer" className="text-[#B03A2E] underline">Googleアカウントの広告設定ページ</a>から、パーソナライズ広告の掲載に使用されるGoogleのCookieを無効にできます。
                             </li>
                         </ul>
                     </section>
@@ -67,7 +69,7 @@ export default function PrivacyPolicy() {
                     <section>
                         <h2 className="text-lg font-bold text-stone-700 mb-2 border-b border-stone-300 pb-1">第6条 著作権および免責事項</h2>
                         <p className="mb-2">
-                            <strong>著作権:</strong> 当アプリに表示される和歌、翻訳文、詳細運勢、デザインの著作権は、開発者[開発者名]に帰属します。
+                            <strong>著作権:</strong> 当アプリに表示される和歌、翻訳文、詳細運勢、デザインの著作権は、開発者ぱんぱすに帰属します。
                         </p>
                         <p>
                             <strong>免責事項:</strong> 当アプリで提供されるおみくじの結果、アドバイスは、古くからの伝承、信仰に基づいたものであり、<strong>その正確性、効果を保証するものではありません。</strong>利用者は自己の判断と責任において本アプリを利用するものとし、本アプリの結果によって生じたいかなる損害についても、開発者は一切の責任を負いません。
@@ -87,11 +89,20 @@ export default function PrivacyPolicy() {
                             プライバシーポリシーに関するご質問は、下記にご連絡ください。
                         </p>
                         <p className="mt-4 font-bold text-[#B03A2E]">
-                            [連絡先メールアドレス]
+                            panpasoma@gmail.com
                         </p>
                     </section>
                 </div>
             </div>
+
+            {/* トップへ戻るボタン */}
+            <Link
+                href="/"
+                className="mt-6 px-6 py-3 bg-[#B03A2E] text-white rounded-lg font-bold text-center hover:bg-[#922B21] transition-colors shadow-md inline-block"
+            >
+                🏠 トップに戻る
+            </Link>
+
             <footer className="text-stone-500 text-xs mt-8">
                 &copy; {new Date().getFullYear()} 今年の運勢
             </footer>
