@@ -321,6 +321,17 @@ export default function ResultClient({ initialCode }: Props) {
                     <RefreshCw className="w-4 h-4 mr-2" />
                     もう一度引く
                 </Link>
+
+                {/* Back to Top Link (AdSense Compliance) */}
+                <div className="sm:col-span-2 flex justify-center mt-4">
+                    <Link
+                        href="/"
+                        className="text-stone-500 text-sm hover:text-stone-800 hover:underline transition-colors flex items-center gap-1"
+                    >
+                        <span>🏠</span>
+                        トップページに戻る
+                    </Link>
+                </div>
             </div>
         </div>
     );

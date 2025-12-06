@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 
@@ -11,7 +12,11 @@ const shipporiMincho = Shippori_Mincho({
 
 export const metadata: Metadata = {
   title: "おみくじ Web",
-  description: "あなたの運勢を占います",
+  description: "2025年の運勢を占うデジタルおみくじ。恋愛運、仕事運、健康運など、あなたの運命を詳細に診断します。結果はSNSでシェア可能！",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +37,7 @@ export default function RootLayout({
         className={`${shipporiMincho.variable} font-serif antialiased bg-stone-100 text-stone-800`}
       >
         {children}
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
   );
